@@ -16,6 +16,12 @@ class Router extends React.Component {
     super(props);
 
     this.state = {
+      // 这里的 location 至少包括以下几个属性
+      // {
+      //   pathname,
+      //   search,
+      //   hash
+      // }
       location: props.history.location
     };
 
@@ -27,11 +33,17 @@ class Router extends React.Component {
     this._isMounted = false;
     this._pendingLocation = null;
 
+    // 静态 context ? 不太理解
+    // 静态 context 就是通常是在测试的时候使用
     if (!props.staticContext) {
+      // 监听路由的变化
       this.unlisten = props.history.listen(location => {
         if (this._isMounted) {
+          // 路由变化有，更新当前的 state
+          // 让 RouterContext.Provider 发生变化
           this.setState({ location });
         } else {
+          // 组件还没有挂载，通常是Redirect组件的使用
           this._pendingLocation = location;
         }
       });
@@ -42,6 +54,8 @@ class Router extends React.Component {
     this._isMounted = true;
 
     if (this._pendingLocation) {
+      // 组件挂载的时候，发现之前已发出重定向
+      // 则在挂载的时候处理重定向
       this.setState({ location: this._pendingLocation });
     }
   }
@@ -56,7 +70,11 @@ class Router extends React.Component {
         children={this.props.children || null}
         value={{
           history: this.props.history,
+          // this.props.history.location
+          // 这个location的初始化的时候是从props拿到的进入的路径信息
           location: this.state.location,
+          // 判断是否是根目录？
+          // { path: "/", url: "/", params: {}, isExact: pathname === "/" };
           match: Router.computeRootMatch(this.state.location.pathname),
           staticContext: this.props.staticContext
         }}

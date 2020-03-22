@@ -52,6 +52,7 @@ const NavLink = forwardRef(
           );
           const { pathname: path } = toLocation;
           // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
+          // 在特殊字符前面添加 \ 这个符号
           const escapedPath =
             path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
 
@@ -86,6 +87,7 @@ const NavLink = forwardRef(
             props.innerRef = innerRef;
           }
 
+          // 调用 Link 组件
           return <Link {...props} />;
         }}
       </RouterContext.Consumer>

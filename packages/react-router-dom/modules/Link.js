@@ -40,6 +40,8 @@ const LinkAnchor = forwardRef(
           throw ex;
         }
 
+        // 如果不是新开页面或者禁止默认A标签事件
+        // 则主动禁止A标签事件，并且主动调用navigate跳转
         if (
           !event.defaultPrevented && // onClick prevented default
           event.button === 0 && // ignore everything but left clicks
@@ -87,6 +89,9 @@ const Link = forwardRef(
         {context => {
           invariant(context, "You should not use <Link> outside a <Router>");
 
+          // context 的内容主要是
+          // { history, location }
+          // history 对象是history库的 createHistory 返回的对象
           const { history } = context;
 
           const location = normalizeToLocation(

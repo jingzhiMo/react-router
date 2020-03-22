@@ -36,11 +36,14 @@ class Route extends React.Component {
 
           const location = this.props.location || context.location;
           const match = this.props.computedMatch
+            // computedMatch 是 Switch 组件已计算好了，不需要重复计算
             ? this.props.computedMatch // <Switch> already computed the match for us
             : this.props.path
-            ? matchPath(location.pathname, this.props)
-            : context.match;
+              ? matchPath(location.pathname, this.props)
+              : context.match;
 
+          // context 的内容是 { history, location }
+          // 这里是局部的 location 覆盖顶部的 location
           const props = { ...context, location, match };
 
           let { children, component, render } = this.props;
@@ -52,24 +55,27 @@ class Route extends React.Component {
           }
 
           return (
+            // 该 context 使用新的 value，
+            // 所以该 context 下的 consumer 是用当前路由匹配到的 value
             <RouterContext.Provider value={props}>
-              {props.match
-                ? children
-                  ? typeof children === "function"
+              { props.match
+                  ? children
+                    ? typeof children === "function"
+                      ? __DEV__
+                        ? evalChildrenDev(children, props, this.props.path)
+                        : children(props)
+                      : children
+                    : component
+                      ? React.createElement(component, props)
+                      : render
+                        ? render(props)
+                        : null
+                  : typeof children === "function"
                     ? __DEV__
                       ? evalChildrenDev(children, props, this.props.path)
                       : children(props)
-                    : children
-                  : component
-                  ? React.createElement(component, props)
-                  : render
-                  ? render(props)
-                  : null
-                : typeof children === "function"
-                ? __DEV__
-                  ? evalChildrenDev(children, props, this.props.path)
-                  : children(props)
-                : null}
+                    : null
+              }
             </RouterContext.Provider>
           );
         }}

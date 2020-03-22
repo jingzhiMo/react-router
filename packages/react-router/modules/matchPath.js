@@ -34,8 +34,10 @@ function matchPath(pathname, options = {}) {
 
   const paths = [].concat(path);
 
+  // path 不是唯一的么？为什么需要循环判断
   return paths.reduce((matched, path) => {
     if (!path && path !== "") return null;
+    // 已经匹配上了
     if (matched) return matched;
 
     const { regexp, keys } = compilePath(path, {
@@ -55,7 +57,9 @@ function matchPath(pathname, options = {}) {
     return {
       path, // the path used to match
       url: path === "/" && url === "" ? "/" : url, // the matched portion of the URL
+      // 是否完全匹配
       isExact, // whether or not we matched exactly
+      // 获取 path 定义的参数，设定到 params
       params: keys.reduce((memo, key, index) => {
         memo[key.name] = values[index];
         return memo;
